@@ -42,7 +42,7 @@ app.post("/add-contact", async (req, res) => {
     res.send("Succefully you have reached the rabbit hole");
   } catch (error) {
     console.log(error);
-    res.status(500).send("Something went wrong");
+    res.status(500).send("Something went wrong, you missed the rabbit hole ");
   }
 });
 
