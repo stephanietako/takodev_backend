@@ -1,6 +1,10 @@
 import Joi from "joi";
 
 const validator = (shema) => (payload) => {
+  // Filtrer les valeurs de chaîne avant de les échapper
+  payload.name = payload.name.filter((c) => c !== "<");
+  payload.lastname = payload.lastname.filter((c) => c !== "<");
+  payload.message = payload.message.filter((c) => c !== "<");
   // Échapper les valeurs de chaîne si nécessaire
   payload.name = encodeURIComponent(payload.name);
   payload.lastname = encodeURIComponent(payload.lastname);
