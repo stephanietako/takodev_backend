@@ -4,7 +4,6 @@ import "dotenv/config";
 import { validateForm } from "./validator.js";
 
 const app = express();
-const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -25,4 +24,6 @@ const formSchema = app.post("/add-contact", (req, res) => {
   res.send("Succefully you have reached the rabbit hole");
 });
 
-app.listen(PORT, () => console.log(`Application démarée sur le port: ${PORT}`));
+app.listen(process.env.PORT, () =>
+  console.log(`Application démarée sur le port: ${process.env.PORT}`)
+);
