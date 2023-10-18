@@ -9,10 +9,10 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/contact", (req, res) => {
   res.send("welcome to the tako dev backend follow the white rabbit");
 });
-app.post("/add-contact", async (req, res) => {
+app.post("/", async (req, res) => {
   const { error, value } = validateForm(req.body);
   if (error) {
     console.log(error.details);
