@@ -1,14 +1,15 @@
 import Joi from "joi";
+import * as sanitizeHtml from "sanitize-html";
 
 const validator = (shema) => (payload) => {
-  // Filtrer les valeurs de chaîne avant de les échapper
-  payload.name = payload.name.filter((c) => c !== "<");
-  payload.lastname = payload.lastname.filter((c) => c !== "<");
-  payload.message = payload.message.filter((c) => c !== "<");
-  // Échapper les valeurs de chaîne si nécessaire
+  // Échappement les valeurs de chaîne si nécessaire
   payload.name = encodeURIComponent(payload.name);
   payload.lastname = encodeURIComponent(payload.lastname);
   payload.message = encodeURIComponent(payload.message);
+  // Nettoyer le HTML des données du formulaire
+  payload.name = sanitizeHtml(payload.name).cleaned;
+  payload.lastname = sanitizeHtml(payload.lastname).cleaned;
+  payload.message = sanitizeHtml(payload.message).cleaned;
 
   return shema.validate(payload, { abortEarly: false });
 };

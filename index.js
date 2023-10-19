@@ -3,16 +3,19 @@ import cors from "cors";
 import "dotenv/config";
 import { validateForm } from "./validator.js";
 import { createTransport } from "nodemailer";
+import helmet from "helmet";
+
 const app = express();
 
+app.use(helmet());
 app.use(cors());
-
 app.use(express.json());
 
-app.get("/contact", (req, res) => {
+app.get("/", (req, res) => {
   res.send("welcome to the tako dev backend follow the white rabbit");
 });
-app.post("/", async (req, res) => {
+
+app.post("/contact", async (req, res) => {
   const { error, value } = validateForm(req.body);
   if (error) {
     console.log(error.details);
