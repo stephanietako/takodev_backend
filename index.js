@@ -11,12 +11,12 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: false }));
 app.get("/", (req, res) => {
   res.send("Welcome to the Tako Dev backend. Follow the white rabbit.");
 });
 
-app.post("/create-contact", async (req, res) => {
+app.post("/contact", async (req, res) => {
   const { error, value } = validateForm(req.body);
   if (error) {
     console.log(error.details);
@@ -24,11 +24,11 @@ app.post("/create-contact", async (req, res) => {
   }
   // Récupérez les données du formulaire
   const { firstname, lastname, email, message } = req.body;
-  console.log("req.body", req.body);
+
   let defaultClient = SibApiV3Sdk.ApiClient.instance;
   let apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = process.env.API_KEY;
-  // Créez une instance de l'API Brevo Contacts
+
   const apiInstance = new SibApiV3Sdk.ContactsApi();
 
   let createContact = new SibApiV3Sdk.CreateContact();
@@ -36,9 +36,8 @@ app.post("/create-contact", async (req, res) => {
     email: email,
     attributes: {
       MESSAGE: message,
-      FNAME: firstname,
-      LNAME: lastname,
-      MESSAGE: message,
+      PRENOM: firstname,
+      NOM: lastname,
     },
 
     listIds: [3],
@@ -46,20 +45,16 @@ app.post("/create-contact", async (req, res) => {
     smsBlacklisted: false,
     updateEnabled: false,
   }),
-    console.log("req.body.firstname", req.body.firstname);
-  console.log("req.body.lastname", req.body.lastname);
-  console.log("req.body.message", req.body.message);
-  // Appelez l'API pour créer le contact
-  apiInstance.createContact(createContact).then(
-    function (data) {
-      console.log("API called successfully. Returned data: ", data);
-      res.json({ success: true });
-    },
-    function (error) {
-      console.error(error);
-      res.json({ success: false });
-    }
-  );
+    apiInstance.createContact(createContact).then(
+      function (data) {
+        console.log("API called successfully. Returned data: ", data);
+        res.json({ success: true });
+      },
+      function (error) {
+        console.error(error);
+        res.json({ success: false });
+      }
+    );
 
   try {
     const response = await fetch("https://api.brevo.com/v3/contacts", {
