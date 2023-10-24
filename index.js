@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
-import fetch from "node-fetch";
 import { validateForm } from "./validator.js";
 import helmet from "helmet";
 import SibApiV3Sdk from "sib-api-v3-sdk";
