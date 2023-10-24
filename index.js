@@ -45,7 +45,7 @@ const sendEmailviaBrevo = async (toEmail, listId, res) => {
 app.post("/email", async (req, res) => {
   console.log("Requête POST /email reçue.");
 
-  const { error, value } = req.body.email;
+  const { error, value } = validateForm(req.body.email);
   if (error) {
     console.log(error.details);
     return res.status(400).json({ error: "Invalid data sent send email." });
