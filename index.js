@@ -13,13 +13,6 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-const corsOptions = {
-  origin: "https://www.takodev.studio", // Remplacez par l'URL de votre site en production
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-};
-
-app.use(cors(corsOptions));
-
 // Fonction pour configurer l'API Brevo
 const setUpBrevo = () => {
   let defaultClient = SibApiV3Sdk.ApiClient.instance;
