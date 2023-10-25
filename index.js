@@ -62,7 +62,7 @@ app.post("/contact", async (req, res) => {
   }
 
   const { firstname, lastname, email, message } = req.body;
-
+  console.log("Data de l'utilisateur : " + firstname, lastname, email, message);
   setUpBrevo();
 
   const createContact = {
