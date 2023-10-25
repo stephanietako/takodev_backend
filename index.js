@@ -14,12 +14,16 @@ app.use(cors());
 app.use(express.json());
 
 // Fonction pour configurer l'API Brevo
-const setUpBrevo = () => {
+const setUpBrevo = (toEmail, listId) => {
   let defaultClient = SibApiV3Sdk.ApiClient.instance;
   let apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = process.env.API_KEY;
 
   apiInstance = new SibApiV3Sdk.ContactsApi();
+  // À l'endroit où vous effectuez l'appel à l'API Brevo
+  console.log("Appel à l'API Brevo avec les données suivantes :");
+  console.log("Email : " + toEmail);
+  console.log("List ID : " + listId);
 };
 
 // Fonction pour stocker des datas de contact d'utilisateur dans Brevo
@@ -48,7 +52,8 @@ app.post("/email", async (req, res) => {
   const userEmail = req.body.email;
   console.log("Adresse e-mail de l'utilisateur : " + userEmail);
 
-  setUpBrevo();
+  setUpBrevo(userEmail, 4); // Passer les données nécessaires à la fonction
+
   sendEmailviaBrevo(userEmail, 4, res);
   send(req.body.email);
 });
