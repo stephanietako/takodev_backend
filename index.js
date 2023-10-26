@@ -60,7 +60,7 @@ app.post("/email", async (req, res) => {
 
 // contact
 app.post("/contact", async (req, res) => {
-  const { error, value } = validateForm(req.body);
+  const { error, value } = req.body;
   if (error) {
     console.log(error.details);
     return res.status(400).json({ error: "Invalid data sent." });
