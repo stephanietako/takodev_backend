@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import { validateForm } from "./validator.js";
 import helmet from "helmet";
+import Joi from "joi";
 import SibApiV3Sdk from "sib-api-v3-sdk";
 import send from "./mailing.js";
 
@@ -14,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // Fonction pour configurer l'API Brevo
-const setUpBrevo = (Email, listId) => {
+const setUpBrevo = (toEmail, listId) => {
   let defaultClient = SibApiV3Sdk.ApiClient.instance;
   let apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = process.env.API_KEY;
@@ -22,7 +23,7 @@ const setUpBrevo = (Email, listId) => {
   apiInstance = new SibApiV3Sdk.ContactsApi();
   // À l'endroit où vous effectuez l'appel à l'API Brevo
   console.log("Appel à l'API Brevo avec les données suivantes :");
-  console.log("Email : " + Email);
+  console.log("Email : " + toEmail);
   console.log("List ID : " + listId);
 };
 
@@ -45,44 +46,16 @@ const sendEmailviaBrevo = async (toEmail, listId, res) => {
   }
 };
 
-// mail
-app.post("/email", async (req, res) => {
-  console.log("Requête POST /email reçue.");
-  // validate email a ajouter
-  const userEmail = req.body.email;
-  console.log("Adresse e-mail de l'utilisateur : " + userEmail);
-
-  setUpBrevo(userEmail, 4); // Passer les données nécessaires à la fonction
-
-  sendEmailviaBrevo(userEmail, 4, res);
-  send(req.body.email);
-});
-
-// contact
-app.post("/contact", async (req, res) => {
-  const { error, value } = req.body;
-  if (error) {
-    console.log(error.details);
-    return res.status(400).json({ error: "Invalid data sent." });
-  }
-
-  const { firstname, lastname, email, message } = req.body;
-  console.log("Data de l'utilisateur : " + firstname, lastname, email, message);
-
-  // Déterminez les valeurs de toEmail et listId pour cette route
-  const toEmail = email; // Par exemple, vous pouvez utiliser l'email de l'utilisateur
-  const listId = 4; // Assurez-vous que c'est la valeur correcte pour cette route
-
-  setUpBrevo(toEmail, listId);
-
+/// Fonction pour stocker des datas de contact d'utilisateur dans Brevo
+const sendContactviaBrevo = async (Form, listId, res) => {
   const createContact = {
-    email,
+    email: Form.email,
     attributes: {
-      MESSAGE: message,
-      PRENOM: firstname,
-      NOM: lastname,
+      PRENOM: Form.firstname,
+      NOM: Form.lastname,
+      MESSAGE: Form.message,
     },
-    listIds: [3],
+    listIds: [listId],
     emailBlacklisted: false,
     smsBlacklisted: false,
     updateEnabled: false,
@@ -95,6 +68,45 @@ app.post("/contact", async (req, res) => {
     console.error(error);
     res.json({ success: false });
   }
+};
+
+// mail
+app.post("/email", async (req, res) => {
+  const { error, value } = req.body;
+  if (error) {
+    console.log(error.details);
+    return res.status(400).json({ error: "Invalid data sent." });
+  }
+  const { email } = req.body;
+  if (!Joi.string().email().validate(email).error === null) {
+    return res.status(400).json({ error: "Invalid email format." });
+  }
+  console.log("Requête POST /email reçue.");
+
+  const userEmail = req.body.email;
+  console.log("Adresse e-mail de l'utilisateur : " + userEmail);
+
+  setUpBrevo(userEmail, 4);
+
+  sendEmailviaBrevo(userEmail, 4, res);
+  send(req.body.email);
+});
+
+// contact
+app.post("/contact", async (req, res) => {
+  const { error, value } = validateForm(req.body);
+  if (error) {
+    console.log(error.details);
+    return res.status(400).json({ error: "Invalid data sent." });
+  }
+  console.log("Requête POST /contact reçue.");
+  console.log("Voici le contenu du body", req.body);
+
+  const userForm = req.body;
+
+  setUpBrevo(req.body.email, 4);
+
+  sendContactviaBrevo(userForm, 3, res);
 });
 
 app.get("/", (req, res) => {
