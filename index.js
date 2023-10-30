@@ -4,12 +4,11 @@ import "dotenv/config";
 import { validateForm } from "./validator.js";
 import helmet from "helmet";
 import Joi from "joi";
-import Brevo from "@getbrevo/brevo";
+import SibApiV3Sdk from "sib-api-v3-sdk";
 import send from "./mailing.js";
 
 const app = express();
 let apiInstance;
-let createContact;
 
 app.use(helmet());
 app.use(cors());
@@ -17,27 +16,15 @@ app.use(express.json());
 
 // Fonction pour configurer l'API Brevo
 const setUpBrevo = (toEmail, listId) => {
-  let defaultClient = Brevo.ApiClient.instance;
+  let defaultClient = SibApiV3Sdk.ApiClient.instance;
   let apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = process.env.API_KEY;
 
-  let api = new Brevo.AccountApi();
-  api.getAccount().then(
-    (data) => {
-      console.log("API called successfully. Returned data");
-    },
-    (error) => {
-      console.error(error);
-    }
-  );
-
-  apiInstance = new Brevo.ContactsApi();
+  apiInstance = new SibApiV3Sdk.ContactsApi();
   console.log("Appel à l'API Brevo avec les données suivantes :");
   console.log("Email : " + toEmail);
   console.log("List ID : " + listId);
 };
-
-createContact = new Brevo.CreateContact();
 
 // Fonction pour stocker des datas de contact d'utilisateur dans Brevo
 const sendEmailviaBrevo = async (toEmail, listId, res) => {
@@ -58,21 +45,29 @@ const sendEmailviaBrevo = async (toEmail, listId, res) => {
   }
 };
 
-/// Fonction pour stocker des datas de contact d'utilisateur dans Brevo
+/// Fonction pour stocker des datas de contact des utilisateurs avec ses attributs dans Brevo
 const sendContactviaBrevo = async (Form, listId, res) => {
+  // création d'un tableau d'attributs
+  const attributesToAdd = [
+    { name: "PRENOM", value: Form.firstname },
+    { name: "NOM", value: Form.lastname },
+    { name: "MESSAGE", value: Form.message },
+  ];
+  // Création d'un objet pour stocker les arttributs
+  const attributesObject = {};
+
+  attributesToAdd.forEach((attribute) => {
+    attributesObject[attribute.name] = attribute.value;
+  });
+
   const createContact = {
     email: Form.email,
-    attributes: {
-      PRENOM: Form.firstname,
-      NOM: Form.lastname,
-      MESSAGE: Form.message,
-    },
+    attributes: attributesObject,
     listIds: [listId],
     emailBlacklisted: false,
     smsBlacklisted: false,
     updateEnabled: false,
   };
-
   try {
     await apiInstance.createContact(createContact);
     res.json({ success: true });
