@@ -4,11 +4,12 @@ import "dotenv/config";
 import { validateForm } from "./validator.js";
 import helmet from "helmet";
 import Joi from "joi";
-import SibApiV3Sdk from "sib-api-v3-sdk";
+import Brevo from "@getbrevo/brevo";
 import send from "./mailing.js";
 
 const app = express();
 let apiInstance;
+let createContact;
 
 app.use(helmet());
 app.use(cors());
@@ -16,16 +17,27 @@ app.use(express.json());
 
 // Fonction pour configurer l'API Brevo
 const setUpBrevo = (toEmail, listId) => {
-  let defaultClient = SibApiV3Sdk.ApiClient.instance;
+  let defaultClient = Brevo.ApiClient.instance;
   let apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = process.env.API_KEY;
 
-  apiInstance = new SibApiV3Sdk.ContactsApi();
-  // À l'endroit où vous effectuez l'appel à l'API Brevo
+  let api = new Brevo.AccountApi();
+  api.getAccount().then(
+    (data) => {
+      console.log("API called successfully. Returned data");
+    },
+    (error) => {
+      console.error(error);
+    }
+  );
+
+  apiInstance = new Brevo.ContactsApi();
   console.log("Appel à l'API Brevo avec les données suivantes :");
   console.log("Email : " + toEmail);
   console.log("List ID : " + listId);
 };
+
+createContact = new Brevo.CreateContact();
 
 // Fonction pour stocker des datas de contact d'utilisateur dans Brevo
 const sendEmailviaBrevo = async (toEmail, listId, res) => {
