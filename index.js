@@ -31,12 +31,7 @@ const setUpBrevo = (toEmail, listId) => {
   );
 
   apiInstance = new Brevo.ContactsApi();
-  console.log("Appel à l'API Brevo avec les données suivantes :");
-  console.log("Email : " + toEmail);
-  console.log("List ID : " + listId);
 };
-
-// createContact = new Brevo.CreateContact();
 
 // Fonction pour stocker des datas de contact d'utilisateur dans Brevo
 const sendEmailviaBrevo = async (toEmail, listId, res) => {
@@ -99,7 +94,6 @@ app.post("/email", async (req, res) => {
   if (!Joi.string().email().validate(email).error === null) {
     return res.status(400).json({ error: "Invalid email format." });
   }
-  console.log("Requête POST /email reçue.");
 
   const userEmail = req.body.email;
   console.log("Adresse e-mail de l'utilisateur : " + userEmail);
@@ -117,8 +111,6 @@ app.post("/contact", async (req, res) => {
     console.log(error.details);
     return res.status(400).json({ error: "Invalid data sent." });
   }
-  console.log("Requête POST /contact reçue.");
-  console.log("Voici le contenu du body", req.body);
 
   const userForm = req.body;
 

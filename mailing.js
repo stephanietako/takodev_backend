@@ -2,7 +2,6 @@ import "dotenv/config";
 import { createTransport } from "nodemailer";
 
 const send = (toEmail) => {
-  console.log("Envoi d'email à l'adresse : " + toEmail);
   const transporter = createTransport({
     host: process.env.HOST,
     port: process.env.PORT_SMTP,
