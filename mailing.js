@@ -1,7 +1,8 @@
 import "dotenv/config";
 import { createTransport } from "nodemailer";
 
-const send = (toEmail) => {
+// Fonction pour envoyer un e-mail
+const sendEmail = (to, subject, text) => {
   const transporter = createTransport({
     host: process.env.HOST,
     port: process.env.PORT_SMTP,
@@ -13,11 +14,11 @@ const send = (toEmail) => {
 
   const mailOptions = {
     from: process.env.TRANSP_USER,
-    to: toEmail,
-    subject: "Contact Tako Dev",
-    text: "Bonjour, merci d'avoir contacté Tako Dev !\n Nous vous tiendrons au courant des newsletters et promotions en cours. A très bientôt",
+    to,
+    subject,
+    text,
   };
-  console.log(mailOptions);
+
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error(error);
@@ -27,4 +28,19 @@ const send = (toEmail) => {
   });
 };
 
-export default send;
+// Fonction pour envoyer l'e-mail de l'utilisateur et une copie
+const send = (toEmail) => {
+  // Envoyer l'e-mail de l'utilisateur
+  const userMailOptions = {
+    from: process.env.TRANSP_USER,
+    to: toEmail,
+    subject: "Contact Tako Dev",
+    text: "Bonjour, merci d'avoir contacté Tako Dev !\n Nous vous tiendrons au courant des newsletters et promotions en cours. A très bientôt",
+    html: "<p>Bonjour, merci d'avoir contacté Tako Dev !\n Nous vous tiendrons au courant des newsletters et promotions en cours. A très bientôt<p>",
+  };
+
+  console.log(userMailOptions);
+  sendEmail(userMailOptions.to, userMailOptions.subject, userMailOptions.text);
+};
+
+export { send, sendEmail }; // Exportez les fonctions send et sendEmail
