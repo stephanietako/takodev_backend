@@ -35,7 +35,6 @@ const setUpBrevo = () => {
 
 // Fonction pour stocker des datas de contact d'utilisateur dans Brevo
 const sendEmailviaBrevo = async (toEmail, listId, res) => {
-  console.log("LISTID SENDEMAIL", listId);
   const createContact = {
     email: toEmail,
     listIds: [listId],
@@ -55,20 +54,6 @@ const sendEmailviaBrevo = async (toEmail, listId, res) => {
 /// Fonction pour stocker des datas de contact des utilisateurs avec ses attributs dans Brevo
 const sendContactviaBrevo = async (toEmail, form, listId, res) => {
   try {
-    // USERMAIL !!!!!!:  dohes72608@mainmile.com
-    console.log("USERMAIL !!!!!!:", toEmail);
-    // le reste est donne les bonnes infos de cntact qui correspondent bien
-    console.log("form SENDCONTACT EMAIL !!!!!!:", toEmail);
-    console.log("form SENDCONTACT FIRSTNAME !!!!!!:", form.firstname);
-    console.log("form SENDCONTACT LASTNAME !!!!!!:", form.lastname);
-    console.log("form SENDCONTACT MESSAGE !!!!!!:", form.message);
-    // ici ça donne les infos completes de contact
-    console.log("form SENDCONTACT !!!!!!:", form);
-    // ici ça donne bien le numero de la liste
-    console.log("form SENDCONTACT !!!!!!:", listId);
-    // ici ça donne bien la reponse
-    console.log("res SENDCONTACT !!!!!!:", res);
-
     const attributesToAdd = [
       { name: "PRENOM", value: form.firstname },
       { name: "NOM", value: form.lastname },
@@ -77,7 +62,7 @@ const sendContactviaBrevo = async (toEmail, form, listId, res) => {
     ];
     // Création d'un objet pour stocker les arttributs
     const attributesObject = {};
-    console.log("ATTRIBUTEOBJECT !!!!!!", attributesObject);
+
     attributesToAdd.forEach((attribute) => {
       attributesObject[attribute.name] = attribute.value;
     });
@@ -91,15 +76,8 @@ const sendContactviaBrevo = async (toEmail, form, listId, res) => {
       attributes: attributesObject,
     };
 
-    console.log("LISTID DANS CREATE CONTACT DE SENDCONTACTVIABREVO", listId);
-    console.log(
-      "ATTRIBUTE OBJECT DANS CREATE CONTACT DE SENDCONTACTVIABREVO",
-      attributesObject
-    );
-    console.log("TOEMAIL CREATE CONTACT DE SENDCONTACTVIABREVO", toEmail);
-
     const data = await apiInstance.createContact(createContact);
-    res.json(data); // Renvoyez la réponse au client ici
+    res.json(data); // Réponse au client ici
     console.log("DATA DANS APIINSTANCE DE CONACT", data);
   } catch (error) {
     console.error(error);
@@ -139,10 +117,10 @@ app.post("/contact", async (req, res) => {
   const emailContact = req.body.email;
   const form = req.body;
 
-  // Supprimez les espaces indésirables de l'e-mail de contact
+  // Supprime les espaces indésirables de l'e-mail de contact
   const cleanedEmailContact = emailContact.trim();
-  // Assurez-vous que vous avez la valeur de userEmail à partir de req.body
-  const userEmail = req.body; // Assurez-vous que le nom est correct
+
+  const userEmail = req.body;
 
   if (!userEmail) {
     res.status(400).json({ error: "userEmail is required." });
@@ -153,7 +131,7 @@ app.post("/contact", async (req, res) => {
   sendContactviaBrevo(cleanedEmailContact, form, 3, res);
   // Envoie une copie de l'e-mail de l'utilisateur
   const copySubject = "Copie de l'e-mail de l'utilisateur";
-  const copyText = `Contenu de la copie\nE-mail de l'utilisateur : ${form.lastname}, ${form.firstname}, ${form.email}, ${form.message}  `;
+  const copyText = `Contenu de la copie\nE-mail de l'utilisateur : ${form.email}, Contenu de la copie\ndu nom et prenom de l'utilisateur ${form.lastname}, ${form.firstname}, Contenu de la copie\ndu message de l'utilisateur ${form.message}  `;
   sendEmail(process.env.TRANSP_USER, copySubject, copyText);
 });
 

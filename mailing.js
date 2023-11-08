@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { createTransport } from "nodemailer";
 
-// Fonction pour envoyer un e-mail
 const sendEmail = (to, subject, text) => {
   const transporter = createTransport({
     host: process.env.HOST,
@@ -30,7 +29,6 @@ const sendEmail = (to, subject, text) => {
 
 // Fonction pour envoyer l'e-mail de l'utilisateur et une copie
 const send = (toEmail) => {
-  // Envoyer l'e-mail de l'utilisateur
   const userMailOptions = {
     from: process.env.TRANSP_USER,
     to: toEmail,
@@ -43,4 +41,4 @@ const send = (toEmail) => {
   sendEmail(userMailOptions.to, userMailOptions.subject, userMailOptions.text);
 };
 
-export { send, sendEmail }; // Exportez les fonctions send et sendEmail
+export { send, sendEmail };
